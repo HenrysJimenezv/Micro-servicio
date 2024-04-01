@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Plato Aleatorio</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Generador de Plato Aleatorio</h1>
+    <button id="generateBtn">Generar Plato Aleatorio</button>
+    <div id="message"></div>
+
+    <script>
+        $(document).ready(function(){
+            $('#generateBtn').click(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: '/generate_dish',
+                    success: function(response) {
+                        $('#message').text(response.message);
+                    },
+                    error: function(xhr, status, error) {
+                        $('#message').text(xhr.responseJSON.message);
+                    }
+                });
+            });
+        });
+
+        // Solicitar las últimas 10 órdenes
+        $(document).ready(function(){
+            $.ajax({
+                type: 'GET',
+                url: '/ultimas_ordenes',
+                success: function(ordenes) {
+                    const ultimasOrdenesContainer = $('#ultimas-ordenes-container');
+                    ordenes.forEach(orden => {
+                        ultimasOrdenesContainer.append(`
+                            <p>ID de Orden: ${orden.id}</p>
+                            <p>ID de Receta: ${orden.recetas_id}</p>
+                            <p>Estado: ${orden.estado_id == 1 ? 'Preparada' : 'En cola'}</p>
+                            <hr>
+                        `);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error al obtener las últimas órdenes:', error);
+                    $('#ultimas-ordenes-container').html(`<p>Error al obtener las últimas órdenes. Por favor, intenta de nuevo más tarde.</p>`);
+                }
+            });
+        });
+    </script>
+
+    <div id="ultimas-ordenes-container">
+        <!-- Aquí se cargarán las últimas 10 órdenes -->
+    </div>
+</body>
+</html>
